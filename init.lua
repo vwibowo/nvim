@@ -42,9 +42,7 @@ vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right win
 vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
 vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
 vim.keymap.set("n", "<leader>q", "<cmd>bd<CR>", { desc = "Buffer Delete" })
--- vim.keymap.set("n", "<tab>", "<Cmd>BufferPrevious<CR>")
--- vim.keymap.set("n", "<S-tab>", "<Cmd>BufferNext<CR>")
--- vim.keymap.set("n", "E", vim.diagnostic.open_float({ scope = "line" }), { desc = "Open Diagnostics" })
+
 vim.keymap.set("n", "E", function()
 	vim.diagnostic.open_float({ scope = "line" })
 end, { desc = "Open Diagnostics" })
@@ -220,102 +218,6 @@ require("lazy").setup({
 			})
 		end,
 	},
-	-- {
-	-- 	-- https://cmp.saghen.dev/installation.html
-	-- 	"saghen/blink.cmp",
-	-- 	event = "VimEnter",
-	-- 	version = "1.*",
-	-- 	dependencies = {
-	-- 		"L3MON4D3/LuaSnip",
-	-- 		version = "v2.*",
-	-- 		build = (function()
-	-- 			if vim.fn.has("win32") == 1 or vim.fn.executable("make") == 0 then
-	-- 				return
-	-- 			end
-	-- 			return "make install_jsregexp"
-	-- 		end)(),
-	-- 		dependencies = {
-	-- 			{
-	-- 				"rafamadriz/friendly-snippets",
-	-- 				config = function()
-	-- 					require("luasnip.loaders.from_vscode").lazy_load()
-	-- 				end,
-	-- 			},
-	-- 		},
-	-- 		"folke/lazydev.nvim",
-	-- 	},
-	-- 	opts = {
-	-- 		snippets = { preset = "luasnip" },
-	-- 		keymap = {
-	-- 			preset = "default",
-	-- 			["<CR>"] = {
-	-- 				function(cmp)
-	-- 					if cmp.snippet_active() then
-	-- 						return cmp.accept()
-	-- 					else
-	-- 						return cmp.select_and_accept()
-	-- 					end
-	-- 				end,
-	-- 				"snippet_forward",
-	-- 				"fallback",
-	-- 			},
-	-- 			["<S-Tab>"] = { "select_prev", "fallback" },
-	-- 			["<Tab>"] = { "select_next", "fallback" },
-	-- 		},
-	-- 		signature = {
-	-- 			enabled = true,
-	-- 		},
-	-- 		appearance = {
-	-- 			nerd_font_variant = "mono",
-	-- 		},
-	-- 		completion = {
-	-- 			keyword = { range = "full" },
-	-- 			accept = { auto_brackets = { enabled = false } },
-	-- 			list = {
-	-- 				selection = {
-	-- 					preselect = false,
-	-- 					auto_insert = true,
-	-- 				},
-	-- 				cycle = {
-	-- 					from_bottom = true,
-	-- 					from_top = true,
-	-- 				},
-	-- 			},
-	-- 			menu = {
-	-- 				enabled = true,
-	-- 				auto_show = true,
-	-- 				draw = {
-	-- 					columns = {
-	-- 						{ "label", "label_description", gap = 1 },
-	-- 						{ "kind_icon", "kind" },
-	-- 					},
-	-- 				},
-	-- 			},
-	-- 			documentation = {
-	-- 				auto_show = true,
-	-- 				treesitter_highlighting = true,
-	-- 			},
-	-- 			trigger = {
-	-- 				show_in_snippet = false,
-	-- 			},
-	-- 		},
-	-- 		sources = {
-	-- 			default = {
-	-- 				"lsp",
-	-- 				"path",
-	-- 				"snippets",
-	-- 				"buffer",
-	-- 				-- "omni",
-	-- 				-- "cmdline"
-	-- 			},
-	-- 			providers = {
-	-- 				lazydev = { module = "lazydev.integrations.blink", score_offset = 100 },
-	-- 			},
-	-- 		},
-	-- 		fuzzy = { implementation = "lua" },
-	-- 	},
-	-- 	opts_extend = { "sources.default" },
-	-- },
 	{
 		"folke/lazydev.nvim",
 		ft = "lua",
@@ -328,7 +230,6 @@ require("lazy").setup({
 	{
 		"neovim/nvim-lspconfig",
 		dependencies = {
-			"saghen/blink.cmp",
 			{ "williamboman/mason.nvim", opts = {} },
 			"williamboman/mason-lspconfig.nvim",
 			"WhoIsSethDaniel/mason-tool-installer.nvim",
@@ -436,7 +337,6 @@ require("lazy").setup({
 				},
 			})
 
-			-- local capabilities = require("blink.cmp").get_lsp_capabilities()
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
 			capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
 

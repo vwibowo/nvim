@@ -42,6 +42,7 @@ vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right win
 vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
 vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
 vim.keymap.set("n", "<leader>q", "<cmd>bd<CR>", { desc = "Buffer Delete" })
+-- vim.keymap.set("n", "<Tab>", "<cmd>Neotree buffers position=current <CR>")
 
 vim.keymap.set("n", "E", function()
 	vim.diagnostic.open_float({ scope = "line" })
@@ -72,7 +73,7 @@ require("lazy").setup({
 	{ "nvim-tree/nvim-web-devicons", opts = {} },
 	{
 		"nvim-neo-tree/neo-tree.nvim",
-		version = "*",
+		branch = "v3.x",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
 			"nvim-tree/nvim-web-devicons",
@@ -80,9 +81,27 @@ require("lazy").setup({
 		},
 		cmd = "Neotree",
 		keys = {
-			{ "<leader>n", ":Neotree toggle position=current <CR>", desc = "NeoTree reveal", silent = true },
+			{
+				"<leader>n",
+				":Neotree toggle position=current <CR>",
+				desc = "NeoTree reveal",
+				silent = true,
+			},
 		},
 		opts = {
+			buffers = {
+				follow_current_file = {
+					enabled = true,
+				},
+				window = {
+					mappings = {
+						["q"] = "close_window",
+						["<esc>"] = "close_window",
+						-- ["<Tab>"] = "move_cursor_down",
+						-- ["<S-Tab>"] = "move_cursor_up",
+					},
+				},
+			},
 			filesystem = {
 				filtered_items = {
 					visible = true,
@@ -215,6 +234,13 @@ require("lazy").setup({
 					{ name = "path" },
 					{ name = "nvim_lsp_signature_help" },
 				},
+			})
+		end,
+		opts = function(_, opts)
+			opts.sources = opts.sources or {}
+			table.insert(opts.sources, {
+				name = "lazydev",
+				group_index = 0, -- set group index to 0 to skip loading LuaLS completions
 			})
 		end,
 	},
@@ -566,17 +592,38 @@ require("lazy").setup({
 			})
 		end,
 	},
-	{ -- You can easily change to a different colorscheme.
-		"folke/tokyonight.nvim",
-		priority = 1000,
+	-- { -- You can easily change to a different colorscheme.
+	-- 	"folke/tokyonight.nvim",
+	-- 	priority = 1000,
+	-- 	config = function()
+	-- 		---@diagnostic disable-next-line: missing-fields
+	-- 		require("tokyonight").setup({
+	-- 			styles = {
+	-- 				comments = { italic = true },
+	-- 				sidebars = "transparent",
+	-- 				floats = "transparent",
+	-- 			},
+	-- 			transparent = true,
+	-- 		})
+	-- 		vim.cmd.colorscheme("tokyonight-night")
+	-- 	end,
+	-- },
+	{
+		"datsfilipe/vesper.nvim",
 		config = function()
-			---@diagnostic disable-next-line: missing-fields
-			require("tokyonight").setup({
-				styles = {
-					comments = { italic = true },
+			require("vesper").setup({
+				transparent = true, -- Boolean: Sets the background to transparent
+				italics = {
+					comments = true, -- Boolean: Italicizes comments
+					keywords = true, -- Boolean: Italicizes keywords
+					functions = true, -- Boolean: Italicizes functions
+					strings = true, -- Boolean: Italicizes strings
+					variables = true, -- Boolean: Italicizes variables
 				},
+				overrides = {}, -- A dictionary of group names, can be a function returning a dictionary or a table.
+				palette_overrides = {},
 			})
-			vim.cmd.colorscheme("tokyonight-night")
+			vim.cmd.colorscheme("vesper")
 		end,
 	},
 })

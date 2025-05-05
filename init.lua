@@ -504,6 +504,9 @@ require("lazy").setup({
 		"nvim-treesitter/nvim-treesitter",
 		build = ":TSUpdate",
 		main = "nvim-treesitter.configs",
+		config = function()
+			require("nvim-treesitter.install").prefer_git = true
+		end,
 		opts = {
 			ensure_installed = {
 				"bash",

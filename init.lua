@@ -44,6 +44,9 @@ vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right win
 vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
 vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
 vim.keymap.set("n", "<leader>q", "<cmd>bd<CR>", { desc = "Buffer Delete" })
+vim.keymap.set("n", "<S-Tab>", "<cmd>bprev<CR>", { desc = "Buffer previous" })
+vim.keymap.set("n", "<Tab>", "<cmd>bnext<CR>", { desc = "Buffer Next" })
+
 -- vim.keymap.set("n", "<Tab>", "<cmd>Neotree buffers position=current <CR>")
 
 vim.filetype.add({

@@ -2,6 +2,7 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 vim.g.have_nerd_font = true
 vim.opt.number = true
+vim.opt.relativenumber = true
 vim.opt.mouse = "a"
 vim.opt.showmode = false
 vim.schedule(function()
@@ -24,6 +25,7 @@ vim.opt.scrolloff = 10
 vim.opt.tabstop = 2
 vim.opt.confirm = true
 vim.opt.shiftwidth = 2
+vim.opt.wrap = false
 vim.o.expandtab = true
 vim.o.foldcolumn = "0"
 vim.o.foldlevel = 99
@@ -43,6 +45,12 @@ vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower win
 vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
 vim.keymap.set("n", "<leader>q", "<cmd>bd<CR>", { desc = "Buffer Delete" })
 -- vim.keymap.set("n", "<Tab>", "<cmd>Neotree buffers position=current <CR>")
+
+vim.filetype.add({
+	extension = {
+		["http"] = "http",
+	},
+})
 
 vim.keymap.set("n", "E", function()
 	vim.diagnostic.open_float({ scope = "line" })
@@ -265,13 +273,11 @@ require("lazy").setup({
 		config = function()
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
-
 				callback = function(event)
 					local map = function(keys, func, desc, mode)
 						mode = mode or "n"
 						vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
 					end
-
 					map("gd", require("telescope.builtin").lsp_definitions, "[G]oto [D]efinition")
 					map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
 					map("gI", require("telescope.builtin").lsp_implementations, "[G]oto [I]mplementation")
@@ -365,7 +371,6 @@ require("lazy").setup({
 
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
 			capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
-
 			local servers = {
 				gopls = {
 					completion = {
@@ -435,26 +440,23 @@ require("lazy").setup({
 					end
 				end, { desc = "Jump to previous git [c]hange" })
 
-				map("v", "<leader>hs", function()
+				map("v", "<leader>gs", function()
 					gitsigns.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
 				end, { desc = "git [s]tage hunk" })
 
-				map("v", "<leader>hr", function()
+				map("v", "<leader>gr", function()
 					gitsigns.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
 				end, { desc = "git [r]eset hunk" })
 
 				-- normal mode
-				map("n", "<leader>hs", gitsigns.stage_hunk, { desc = "git [s]tage hunk" })
-				map("n", "<leader>hr", gitsigns.reset_hunk, { desc = "git [r]eset hunk" })
-				map("n", "<leader>hS", gitsigns.stage_buffer, { desc = "git [S]tage buffer" })
-				map("n", "<leader>hu", gitsigns.stage_hunk, { desc = "git [u]ndo stage hunk" })
-				map("n", "<leader>hR", gitsigns.reset_buffer, { desc = "git [R]eset buffer" })
-				map("n", "<leader>hp", gitsigns.preview_hunk, { desc = "git [p]review hunk" })
-				map("n", "<leader>hb", gitsigns.blame_line, { desc = "git [b]lame line" })
-				map("n", "<leader>hd", gitsigns.diffthis, { desc = "git [d]iff against index" })
-				map("n", "<leader>hD", function()
-					gitsigns.diffthis("@")
-				end, { desc = "git [D]iff against last commit" })
+				map("n", "<leader>gs", gitsigns.stage_hunk, { desc = "git [s]tage hunk" })
+				map("n", "<leader>gr", gitsigns.reset_hunk, { desc = "git [r]eset hunk" })
+				map("n", "<leader>gS", gitsigns.stage_buffer, { desc = "git [S]tage buffer" })
+				map("n", "<leader>gu", gitsigns.stage_hunk, { desc = "git [u]ndo stage hunk" })
+				map("n", "<leader>gR", gitsigns.reset_buffer, { desc = "git [R]eset buffer" })
+				map("n", "<leader>gp", gitsigns.preview_hunk, { desc = "git [p]review hunk" })
+				map("n", "<leader>gb", gitsigns.blame_line, { desc = "git [b]lame line" })
+				map("n", "<leader>gB", gitsigns.blame, { desc = "git [b]lame" })
 				map("n", "<leader>tb", gitsigns.toggle_current_line_blame, { desc = "[T]oggle git show [b]lame line" })
 				map("n", "<leader>tD", gitsigns.preview_hunk_inline, { desc = "[T]oggle git show [D]eleted" })
 			end,
@@ -477,38 +479,25 @@ require("lazy").setup({
 		config = function()
 			require("telescope").setup({})
 			pcall(require("telescope").load_extension, "fzf")
-
 			local builtin = require("telescope.builtin")
-			vim.keymap.set("n", "<leader>sh", builtin.help_tags, { desc = "[S]earch [H]elp" })
 			vim.keymap.set("n", "<leader>sk", builtin.keymaps, { desc = "[S]earch [K]eymaps" })
 			vim.keymap.set("n", "<leader>sf", builtin.find_files, { desc = "[S]earch [F]iles" })
 			vim.keymap.set("n", "<leader>ss", builtin.builtin, { desc = "[S]earch [S]elect Telescope" })
 			vim.keymap.set("n", "<leader>sw", builtin.grep_string, { desc = "[S]earch current [W]ord" })
 			vim.keymap.set("n", "<leader>sg", builtin.live_grep, { desc = "[S]earch by [G]rep" })
 			vim.keymap.set("n", "<leader>sd", builtin.diagnostics, { desc = "[S]earch [D]iagnostics" })
-			vim.keymap.set("n", "<leader>sr", builtin.resume, { desc = "[S]earch [R]esume" })
-			vim.keymap.set("n", "<leader>s.", builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-			vim.keymap.set("n", "<leader>b", builtin.buffers, { desc = "[ ] Find existing buffers" })
 			vim.keymap.set("n", "<leader>/", function()
 				builtin.current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
-					winblend = 10,
+					winblend = 20,
 					previewer = false,
 				}))
 			end, { desc = "[/] Fuzzily search in current buffer" })
-
-			vim.keymap.set("n", "<leader>s/", function()
-				builtin.live_grep({
-					grep_open_files = true,
-					prompt_title = "Live Grep in Open Files",
-				})
-			end, { desc = "[S]earch [/] in Open Files" })
-
 			vim.keymap.set("n", "<tab>", function()
 				builtin.buffers(require("telescope.themes").get_dropdown({
-					winblend = 10,
+					winblend = 20,
 					previewer = false,
 				}))
-			end, { desc = "Buffers" })
+			end, { desc = "Search Buffers" })
 		end,
 	},
 	{
@@ -550,9 +539,44 @@ require("lazy").setup({
 		"folke/which-key.nvim",
 		event = "VimEnter",
 		opts = {
-			delay = 200,
+			delay = 0,
+			spec = {
+				{ "<leader>s", group = "[S]earch" },
+				{ "<leader>t", group = "[T]oggle" },
+				{ "<leader>h", group = "Git [H]unk", mode = { "n", "v" } },
+			},
 			icons = {
 				mappings = vim.g.have_nerd_font,
+				keys = vim.g.have_nerd_font and {} or {
+					Up = "<Up> ",
+					Down = "<Down> ",
+					Left = "<Left> ",
+					Right = "<Right> ",
+					C = "<C-…> ",
+					M = "<M-…> ",
+					D = "<D-…> ",
+					S = "<S-…> ",
+					CR = "<CR> ",
+					Esc = "<Esc> ",
+					ScrollWheelDown = "<ScrollWheelDown> ",
+					ScrollWheelUp = "<ScrollWheelUp> ",
+					NL = "<NL> ",
+					BS = "<BS> ",
+					Space = "<Space> ",
+					Tab = "<Tab> ",
+					F1 = "<F1>",
+					F2 = "<F2>",
+					F3 = "<F3>",
+					F4 = "<F4>",
+					F5 = "<F5>",
+					F6 = "<F6>",
+					F7 = "<F7>",
+					F8 = "<F8>",
+					F9 = "<F9>",
+					F10 = "<F10>",
+					F11 = "<F11>",
+					F12 = "<F12>",
+				},
 			},
 		},
 	},
@@ -592,22 +616,6 @@ require("lazy").setup({
 			})
 		end,
 	},
-	-- { -- You can easily change to a different colorscheme.
-	-- 	"folke/tokyonight.nvim",
-	-- 	priority = 1000,
-	-- 	config = function()
-	-- 		---@diagnostic disable-next-line: missing-fields
-	-- 		require("tokyonight").setup({
-	-- 			styles = {
-	-- 				comments = { italic = true },
-	-- 				sidebars = "transparent",
-	-- 				floats = "transparent",
-	-- 			},
-	-- 			transparent = true,
-	-- 		})
-	-- 		vim.cmd.colorscheme("tokyonight-night")
-	-- 	end,
-	-- },
 	{
 		"datsfilipe/vesper.nvim",
 		config = function()
@@ -624,6 +632,171 @@ require("lazy").setup({
 				palette_overrides = {},
 			})
 			vim.cmd.colorscheme("vesper")
+		end,
+	},
+	{
+		"stevearc/aerial.nvim",
+		opts = {},
+		-- Optional dependencies
+		dependencies = {
+			"nvim-treesitter/nvim-treesitter",
+			"nvim-tree/nvim-web-devicons",
+		},
+		config = function()
+			require("aerial").setup({
+				on_attach = function(bufnr)
+					-- Jump forwards/backwards with '{' and '}'
+					vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr })
+					vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr })
+				end,
+				keymaps = {
+					["<esc>"] = "actions.close",
+				},
+				lazy_load = true,
+			})
+			vim.keymap.set("n", "<leader>a", "<cmd>AerialToggle!<CR>", { desc = "Code Outline" })
+		end,
+	},
+	{
+		"mistweaverco/kulala.nvim",
+		keys = {
+			{ "<leader>Rs", desc = "Send request", group = "Request" },
+			{ "<leader>Ra", desc = "Send all requests", group = "Request" },
+			{ "<leader>Rb", desc = "Open scratchpad", group = "Request" },
+		},
+		ft = { "http", "rest" },
+		opts = {
+			global_keymaps = true,
+		},
+	},
+	{
+		"mfussenegger/nvim-dap",
+		dependencies = {
+			"rcarriga/nvim-dap-ui",
+			"nvim-neotest/nvim-nio",
+			"williamboman/mason.nvim",
+			"jay-babu/mason-nvim-dap.nvim",
+			"leoluz/nvim-dap-go",
+		},
+		keys = {
+			{
+				"<F5>",
+				function()
+					require("dap").continue()
+				end,
+				desc = "Debug: Start/Continue",
+			},
+			{
+				"<F1>",
+				function()
+					require("dap").step_into()
+				end,
+				desc = "Debug: Step Into",
+			},
+			{
+				"<F2>",
+				function()
+					require("dap").step_over()
+				end,
+				desc = "Debug: Step Over",
+			},
+			{
+				"<F3>",
+				function()
+					require("dap").step_out()
+				end,
+				desc = "Debug: Step Out",
+			},
+			{
+				"<leader>b",
+				function()
+					require("dap").toggle_breakpoint()
+				end,
+				desc = "Debug: Toggle Breakpoint",
+			},
+			{
+				"<leader>B",
+				function()
+					require("dap").set_breakpoint(vim.fn.input("Breakpoint condition: "))
+				end,
+				desc = "Debug: Set Breakpoint",
+			},
+			-- Toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
+			{
+				"<F7>",
+				function()
+					require("dapui").toggle()
+				end,
+				desc = "Debug: See last session result.",
+			},
+		},
+		config = function()
+			local dap = require("dap")
+			local dapui = require("dapui")
+
+			require("mason-nvim-dap").setup({
+				-- Makes a best effort to setup the various debuggers with
+				-- reasonable debug configurations
+				automatic_installation = true,
+
+				-- You can provide additional configuration to the handlers,
+				-- see mason-nvim-dap README for more information
+				handlers = {},
+
+				-- You'll need to check that you have the required things installed
+				-- online, please don't ask me how to install them :)
+				ensure_installed = {
+					-- Update this to ensure that you have the debuggers for the langs you want
+					"delve",
+				},
+			})
+
+			-- Dap UI setup
+			-- For more information, see |:help nvim-dap-ui|
+			dapui.setup({
+				-- Set icons to characters that are more likely to work in every terminal.
+				--    Feel free to remove or use ones that you like more! :)
+				--    Don't feel like these are good choices.
+				icons = { expanded = "▾", collapsed = "▸", current_frame = "*" },
+				controls = {
+					icons = {
+						pause = "⏸",
+						play = "▶",
+						step_into = "⏎",
+						step_over = "⏭",
+						step_out = "⏮",
+						step_back = "b",
+						run_last = "▶▶",
+						terminate = "⏹",
+						disconnect = "⏏",
+					},
+				},
+			})
+
+			-- Change breakpoint icons
+			-- vim.api.nvim_set_hl(0, 'DapBreak', { fg = '#e51400' })
+			-- vim.api.nvim_set_hl(0, 'DapStop', { fg = '#ffcc00' })
+			-- local breakpoint_icons = vim.g.have_nerd_font
+			--     and { Breakpoint = '', BreakpointCondition = '', BreakpointRejected = '', LogPoint = '', Stopped = '' }
+			--   or { Breakpoint = '●', BreakpointCondition = '⊜', BreakpointRejected = '⊘', LogPoint = '◆', Stopped = '⭔' }
+			-- for type, icon in pairs(breakpoint_icons) do
+			--   local tp = 'Dap' .. type
+			--   local hl = (type == 'Stopped') and 'DapStop' or 'DapBreak'
+			--   vim.fn.sign_define(tp, { text = icon, texthl = hl, numhl = hl })
+			-- end
+
+			dap.listeners.after.event_initialized["dapui_config"] = dapui.open
+			dap.listeners.before.event_terminated["dapui_config"] = dapui.close
+			dap.listeners.before.event_exited["dapui_config"] = dapui.close
+
+			-- Install golang specific config
+			require("dap-go").setup({
+				delve = {
+					-- On Windows delve must be run attached or it crashes.
+					-- See https://github.com/leoluz/nvim-dap-go/blob/main/README.md#configuring
+					detached = vim.fn.has("win32") == 0,
+				},
+			})
 		end,
 	},
 })
